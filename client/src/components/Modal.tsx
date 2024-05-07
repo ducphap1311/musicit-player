@@ -59,7 +59,7 @@ export const Modal = () => {
         videoId: string,
         url: string,
         title: string,
-        channelTitle: string
+        channelTitle: string,
     ) => {
         let flag = false;
         setLoading(true);
@@ -99,6 +99,7 @@ export const Modal = () => {
                 url,
                 title,
                 data,
+                isExpired: false
             })
         );
         setLoading(false);

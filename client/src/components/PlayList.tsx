@@ -32,14 +32,16 @@ export const PlayList: React.FC<{isPlaying: boolean}> = ({isPlaying}) => {
         channelTitle,
         url,
         data,
+        isExpired
     }: {
         videoId: string;
         title: string;
         channelTitle: string;
         url: string;
         data: string;
+        isExpired: boolean
     }) => {
-        dispatch(createAudio({ videoId, title, channelTitle, url, data }));
+        dispatch(createAudio({ videoId, title, channelTitle, url, data, isExpired }));
     };
 
     const handleDownLoad = async (videoId: string) => {
@@ -93,6 +95,7 @@ export const PlayList: React.FC<{isPlaying: boolean}> = ({isPlaying}) => {
                                             channelTitle: play.channelTitle,
                                             url: play.url,
                                             data: play.data,
+                                            isExpired: play.isExpired
                                         })
                                     }
                                 >

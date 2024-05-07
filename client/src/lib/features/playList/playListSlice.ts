@@ -6,6 +6,7 @@ type Song = {
     title?: string;
     data?: string;
     url?: string;
+    isExpired?: boolean;
 };
 
 interface Types {

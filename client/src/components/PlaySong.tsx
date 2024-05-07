@@ -10,7 +10,8 @@ import { GiPauseButton } from "react-icons/gi";
 import { FaPlay } from "react-icons/fa6";
 import { BsArrowRepeat } from "react-icons/bs";
 import { FaYoutube } from "react-icons/fa";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import { createSourceAudio } from "@/api/createService";
 
 type Song = {
     videoId?: string;
@@ -18,6 +19,7 @@ type Song = {
     title?: string;
     data?: string;
     url?: string;
+    isExpired?: boolean;
 };
 
 export const PlaySong = () => {
@@ -118,6 +120,7 @@ export const PlaySong = () => {
                 playList[index - 1];
             dispatch(createAudio({ videoId, title, channelTitle, url, data }));
         }
+        
     };
 
     function generateRandom(max: number): number {
@@ -135,19 +138,32 @@ export const PlaySong = () => {
         dispatch(createAudio({ videoId, title, channelTitle, url, data }));
     };
 
-    const handleAudioError = () => {
-        // alert("This song has been expired or not allowed to use!")
-        toast("This song has been expired or not allowed to use!", {
-            type: "warning",
-            draggable: true,
-            position: "bottom-center",
-            theme: "dark",
-            closeOnClick: true,
-            
-        });
-        dispatch(deleteSong(currentSong.videoId));
-        dispatch(createAudio({}))
+    const handleAudioError = async () => {        
+        const {videoId, title, channelTitle, url, isExpired} = currentSong;        
+        if(isExpired === false){
+            if(videoId){
+                const data = await createSourceAudio(videoId)
+                dispatch(createAudio({videoId, title, channelTitle, url, isExpired: true, data}))
+            }
+        } else {            
+            toast("This audio not allowed to use!", {
+                type: "warning",
+                draggable: true,
+                position: "bottom-center",
+                theme: "dark",
+                closeOnClick: true,
+            });
+            dispatch(deleteSong(currentSong.videoId));
+            dispatch(createAudio({}));
+        }
     };
+
+    const handleAudioLoaded = () => {
+        const {videoId, title, channelTitle, url, isExpired, data} = currentSong;        
+        if(isExpired === true){
+            dispatch(createAudio({videoId, title, channelTitle, url, isExpired: false, data}))
+        }        
+    }
 
     const togglePlayAndPause = () => {
         if (currentSong.title) {
@@ -172,6 +188,9 @@ export const PlaySong = () => {
             audioRef.current.currentTime = Math.floor(Number(e.target.value));
         }
     };
+    
+    
+
     return (
         <>
             <div className="max-w-[770px] mt-36 flex flex-col mx-4 md:mx-auto items-center md:items-start md:flex-row z-20">
@@ -343,6 +362,7 @@ export const PlaySong = () => {
                     </div>
                     <audio
                         onError={handleAudioError}
+                        onLoadedMetadata={handleAudioLoaded}
                         preload="metadata"
                         src={currentSong.data}
                         hidden

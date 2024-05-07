@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-    baseURL: 'http://localhost:3001'
+    baseURL: 'https://api-music-player.vercel.app'
 })
 
 export const get = async (path: string, option = {}) => {
